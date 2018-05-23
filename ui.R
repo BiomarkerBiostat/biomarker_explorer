@@ -365,13 +365,7 @@ shinyUI(navbarPage(
                     'ass_plot_bsmodal', 'Download page', 'ass_download_plot_action',
                     size = 'large',
                     fluidRow(
-                        column(
-                            width = 3,
-                            selectInput(
-                                'ass_download_plot_format', 'Plot format',
-                                choices = c('Choose' = '', ass_download_plot_formats)
-                            )
-                        ),
+                        column(width = 3, uiOutput('ass_download_plot_format')),
                         column(width = 3, uiOutput('ass_download_plot_height')),
                         column(width = 3, uiOutput('ass_download_plot_width')),
                         column(width = 3, uiOutput('ass_download_plot_multibmk')),
