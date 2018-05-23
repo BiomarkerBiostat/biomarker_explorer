@@ -2437,7 +2437,7 @@ shinyServer(function(input, output, session) {
             }
             else if(!is_blank(input$time_download_multibmk)){
             
-            pdf(file)
+            pdf(file = file, width = width, height = height)
             footnote <- r_format(time_plot_footnote$value, tnf$time_current)
             footnote <- trimws(paste(footnote,default_footnote_lines(), sep = '\n'))
             #plot_ <- add_footnote(plot_, footnote)
@@ -3071,6 +3071,21 @@ shinyServer(function(input, output, session) {
     #-------------------------------------------------
     
     # --- UI widgets for producing histogram ---
+    output$ass_download_plot_format <- renderUI({
+      if(is_blank(input$ass_download_plot_multibmk) || (!is_blank(input$ass_download_plot_multibmk) && length(input$ass_hist_bmk) > 1)) {
+        selectInput(
+          'ass_download_plot_format', 'Graph format',
+          choices = c('Choose' = '', ass_download_plot_formats)
+        )
+      }
+      else if (!is_blank(input$ass_download_plot_multibmk)) {
+        ass_download_plot_formats = c('pdf')
+        selectInput(
+          'ass_download_plot_format', 'Graph format',
+          choices = c('Choose' = '', ass_download_plot_formats)
+        )
+      }
+    })
     
     # a selectInput for choosing variable
     output$ass_hist_var <- renderUI({
@@ -3593,9 +3608,13 @@ shinyServer(function(input, output, session) {
     ass_hist_data <- reactive({
         req(ass_hist_show$value)
         data <- ass_data_input$value
-        if(!is_blank(input$ass_hist_bmk)) {
+        if(!is_blank(input$ass_hist_bmk) && is_blank(input$ass_download_plot_multibmk)) {
             cond_param <- data[[param_col]] %in% input$ass_hist_bmk
             data <- data[cond_param, , drop = F]
+        }
+        else if(!is_blank(input$ass_download_plot_multibmk) && length(input$ass_hist_bmk) == 1) {
+          cond_param <- data[[param_col]] %in% input$ass_download_plot_multibmk
+          data <- data[cond_param, , drop = F]
         }
         if(!is_blank(input$ass_hist_visits)) {
             cond_visits <- data[[xlabel_col]] %in% input$ass_hist_visits
@@ -3684,6 +3703,77 @@ shinyServer(function(input, output, session) {
         }
         return(plot_)
     })
+    
+    ass_hist_m_plot <- reactive({
+      req(ass_hist_data(),
+          !is_blank(input$ass_hist_geom),
+          !is.null(input$ass_hist_log_x))
+      data <- ass_hist_data()
+      
+      ## object to save all the data frame for each biomarker;
+      multi_bm_obj <- list()
+      unique_bmk <- c(unique(input$ass_download_plot_multibmk))
+      
+      for (i in unique_bmk){
+        multi_bm1 <- data[data[[param_col]] == i, , drop = F]
+      
+          if(length(ass_hist_group_levs$value) <= 1)
+            all_colors = gg_color_hue(1)
+          else all_colors = gg_color_hue(length(ass_hist_group_levs$value))
+          if(!is_blank(input$ass_hist_facet_r)) {
+            multi_bm1[[input$ass_hist_facet_r]] <- paste0(
+              input$ass_hist_facet_r, ': ',multi_bm1[[input$ass_hist_facet_r]]
+            )
+          }
+          if(!is_blank(input$ass_hist_facet_c)) {
+            multi_bm1[[input$ass_hist_facet_c]] <- paste0(
+              input$ass_hist_facet_c, ': ', multi_bm1[[input$ass_hist_facet_c]]
+            )
+          }
+          
+          #x_lab <- r_format(ass_hist_xlab$value, tnf$ass_current)
+          #y_lab <- r_format(ass_hist_ylab$value, tnf$ass_current)
+          #plot_title <- r_format(ass_hist_title$value, tnf$ass_current)
+          
+          x_lab <- ass_hist_xlab$value
+          y_lab <- ass_hist_ylab$value
+          
+          plot_title_tmp <- ass_hist_title$value
+          if (plot_title_tmp != 'Study: {Study}'){
+            plot_title <- paste(ass_hist_title$value, '\n', i)
+          }
+          else if (plot_title_tmp == 'Study: {Study}'){
+            plot_title <- i
+          }
+          
+          
+          
+          plot_ <- gg_wrapper(
+            data = multi_bm1,
+            aes_string(x = paste0('`', input$ass_hist_var, '`')),
+            facet_r = input$ass_hist_facet_r, facet_c = input$ass_hist_facet_c,
+            x_lab = x_lab, y_lab = y_lab, title = plot_title,
+            x_log = isTRUE(input$ass_hist_log_x),
+            color_var = input$ass_hist_group, all_colors = all_colors,
+            fill_var = input$ass_hist_group, all_fills = all_colors,
+            bw_theme = TRUE, grids = 'on'
+          )
+          if(input$ass_hist_geom == 'Histogram') {
+            plot_ <- plot_ + geom_histogram(aes(y = ..density.., colour = NULL),
+                                            alpha = .5, position = 'identity')
+          } else if(input$ass_hist_geom == 'Density curve') {
+            plot_ <- plot_ + geom_density(aes(fill = NULL))
+          } else {
+            plot_ <- plot_ +
+              geom_histogram(aes(y = ..density.., colour = NULL),
+                             alpha = .5, position = 'identity') +
+              
+              geom_density(alpha = .5, aes(fill = NULL))
+          }
+          multi_bm_obj[[i]] <- plot_
+      } 
+      return(multi_bm_obj)
+    })    
     
     
     #####################################################################
@@ -6091,8 +6181,11 @@ shinyServer(function(input, output, session) {
     observe({
         data <- ass_data_input$value
         if(isTRUE(ass_box_show$value)) {
-            if(!is_blank(input$ass_box_bmk)) {
+            if(!is_blank(input$ass_box_bmk) && is_blank(input$ass_download_plot_multibmk)) {
                 data <- data[data[[param_col]] %in% input$ass_box_bmk, , drop = F]
+            }
+            else if(!is_blank(input$ass_download_plot_multibmk)) {
+              data <- data[data[[param_col]] %in% input$ass_download_plot_multibmk, , drop = F]
             }
             if(!is_blank(input$ass_box_visits)) {
                 data <- data[data[[xlabel_col]] %in% input$ass_box_visits, , drop = F]
@@ -6992,6 +7085,7 @@ shinyServer(function(input, output, session) {
             ass_hist_show$value)
         downloadButton('ass_download_hist', strong('Download Plot'))
     })
+
     output$ass_download_hist <- downloadHandler(
         filename = function() {
             file_name <- paste0(
@@ -7005,11 +7099,31 @@ shinyServer(function(input, output, session) {
             width = input$ass_download_plot_width
             dev <- plot_dev(tolower(input$ass_download_plot_format), file,
                             dpi = 600)
+            
+            
+            #####################################
+            # Single/ Multiple biomarker plot output
+            #####################################
+            if(is_blank(input$ass_download_plot_multibmk) || (!is_blank(input$ass_download_plot_multibmk) && length(input$ass_hist_bmk) > 1)){
+             
             dev(file = file, width = width, height = height)
-            plot_ <- add_footnote(ass_hist_plot(),
-                                  trimws(ass_hist_footnote_in$value))
-            grid.draw(plot_)
-            dev.off()
+              plot_ <- add_footnote(ass_hist_plot(),
+                                    trimws(ass_hist_footnote_in$value))
+              grid.draw(plot_)
+              dev.off()
+            } 
+            
+            else if(!is_blank(input$ass_download_plot_multibmk)){
+              pdf(file = file, width = width, height = height)
+              for (i in 1:length(c(unique(input$ass_download_plot_multibmk)))){
+                temp <- ass_hist_m_plot()
+                plot_ <- temp[[i]]
+                print(plot_)
+              }
+              dev.off()
+            }  
+              
+              
         }
     )
     # download button widget on download page for association scatter plot
