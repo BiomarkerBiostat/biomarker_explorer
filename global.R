@@ -76,6 +76,7 @@ install_('ggrepel')
 install_('qpcR')
 install_('gtools')
 # install_('psychometric')
+install_('clinfun')
 source('r_scripts/common_statistics.R')
 source('r_scripts/strings.R')
 source('r_scripts/function_utils.R')
@@ -254,7 +255,8 @@ ass_scatter_correlation_types <- c('Spearman', 'Pearson')
 ass_box_tests <- c(wilcox = 'Wilcox rank sum test',
                    t = 'Two sample t test',
                    kruskal = 'Kruskal Wallis test',
-                   anova = 'ANOVA')
+                   anova = 'ANOVA',
+                   jonckheere = 'Jonckheere-Terpstra test')
 ass_box_statistical_test <- c('Parametric', 'Non-parametric')
 ass_table_statistical_test <- c('Chi-square', 'Fisher')
 ass_table_percentage_types <- c('None' = '', 'Row', 'Column')
