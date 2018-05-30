@@ -6287,10 +6287,9 @@ shinyServer(function(input, output, session) {
             
             #=========Added By WANGSHU
             if(test_method == 'jonckheere.test') {
-              data[[group_var]] <- as.numeric(as.factor(data[[group_var]]))
-              formula_ <- "data[[input$ass_box_y]], data[[group_var]]"
+              data[[group_var]] <- ordered(data[[group_var]])
+              test_method <- 'JonckheereTerpstraTest'
             }
-            #=========END Added by WANGSHU
             
             test_func <- match.fun(test_method)
             if(is_blank(dots_group)) {
@@ -6314,25 +6313,16 @@ shinyServer(function(input, output, session) {
                     arrange_(.dots = dots_group) %>%
                     group_by_(.dots = dots_group)
             }
-            if(test_method == 'jonckheere.test'){
-              test_result <- data %>%
-                do(test = tryCatch(
-                  suppressWarnings(eval(parse(text=paste0("test_func(", formula_, ")")))),
-                  error = function(e) {NULL}
-                )) %>%
-                filter(!is.null(test)) %>%
-                summarise_(.dots = dots_summarise) %>%
-                mutate(p_value_text = paste('p value =', round(p_value, 3)))
-            } else {
-              test_result <- data %>%
-                do(test = tryCatch(
-                  suppressWarnings(test_func(formula_, data = .)),
-                  error = function(e) {NULL}
-                )) %>%
-                filter(!is.null(test)) %>%
-                summarise_(.dots = dots_summarise) %>%
-                mutate(p_value_text = paste('p value =', round(p_value, 3)))
-            }
+
+            test_result <- data %>%
+              do(test = tryCatch(
+                suppressWarnings(test_func(formula_, data = .)),
+                error = function(e) {NULL}
+              )) %>%
+              filter(!is.null(test)) %>%
+              summarise_(.dots = dots_summarise) %>%
+              mutate(p_value_text = paste('p value =', round(p_value, 3)))
+
             ass_box_test$value <- test_result
         } else {
             ass_box_test$value <- NULL
