@@ -3677,8 +3677,9 @@ shinyServer(function(input, output, session) {
         
         x_lab <- ass_hist_xlab$value
         y_lab <- ass_hist_ylab$value
-        plot_title <- ass_hist_title$value
         
+        plot_title <- ass_hist_title$value
+
         plot_ <- gg_wrapper(
             data = data,
             aes_string(x = paste0('`', input$ass_hist_var, '`')),
@@ -6318,6 +6319,91 @@ shinyServer(function(input, output, session) {
         }
     })
     
+    
+    ## 
+    # equality test result for multi boxplot output
+    ass_box_m_test <- reactive({
+ 
+      data <- ass_box_data$value
+      ## object to save all the test data frame for each biomarker;
+      multi_bm_test <- list()
+      unique_bmk <- c(unique(input$ass_download_plot_multibmk))
+      for (i in unique_bmk){
+        multi_bm1 <- data[data[[param_col]] == i, , drop = F]
+        has_x <- !is_blank(input$ass_box_x) && !is_blank(ass_box_xlevs$value)
+        has_group <- !is_blank(input$ass_box_group) &&
+          !is_blank(ass_box_group_levs$value)
+        if(has_group) ncategories <- length(ass_box_group_levs$value)
+        else ncategories <- length(ass_box_xlevs$value)
+        if(all(isTRUE(ass_box_show$value), !is_blank(input$ass_box_test),
+               has_x || has_group, ncategories >= 2,
+               !is.null(multi_bm1), nrow(multi_bm1) > 0)) {
+          group_list <- NULL
+          if(!is_blank(input$ass_box_facet_r)) {
+            group_list <- c(group_list, input$ass_box_facet_r)
+            multi_bm1[[input$ass_box_facet_r]] <- paste0(
+              input$ass_box_facet_r, ': ', multi_bm1[[input$ass_box_facet_r]]
+            )
+          }
+          if(!is_blank(input$ass_box_facet_c)) {
+            group_list <- c(group_list, input$ass_box_facet_c)
+            multi_bm1[[input$ass_box_facet_c]] <- paste0(
+              input$ass_box_facet_c, ': ', multi_bm1[[input$ass_box_facet_c]]
+            )
+          }
+          has_x <- !is_blank(input$ass_box_x)
+          has_group <- !is_blank(input$ass_box_group)
+          has_both <- has_x && has_group
+          if(has_both) group_list <- c(group_list, input$ass_box_x)
+          dots_group <- lapply(group_list, as.symbol)
+          group_var <- ifelse(has_group, input$ass_box_group, input$ass_box_x)
+          formula_ <- formula(paste(input$ass_box_y, '~', group_var))
+          test_method <- paste(
+            names(ass_box_tests)[ass_box_tests == input$ass_box_test],
+            'test', sep = '.'
+          )
+          test_func <- match.fun(test_method)
+          if(is_blank(dots_group)) {
+            p_value_expr <- lazyeval::interp(
+              ~var[[1]]$p.value, var = as.name('test')
+            )
+          } else {
+            p_value_expr <- lazyeval::interp(
+              ~var$p.value,var = as.name('test')
+            )
+          }
+          if(has_both)
+            x_expr <- lazyeval::interp(~as.integer(var),
+                                       var = as.name(input$ass_box_x))
+          else x_expr <- ~(-Inf)
+          dots_summarise <- setNames(c(
+            as.list(group_list), list(p_value_expr, x_expr, ~(Inf))
+          ), c(group_list, 'p_value', 'x', 'y'))
+          if(!is_blank(dots_group)) {
+            multi_bm1 <- multi_bm1 %>%
+              arrange_(.dots = dots_group) %>%
+              group_by_(.dots = dots_group)
+          }
+          test_result <- multi_bm1 %>%
+            do(test = tryCatch(
+              suppressWarnings(test_func(formula_, data = .)),
+              error = function(e) {NULL}
+            )) %>%
+            filter(!is.null(test)) %>%
+            summarise_(.dots = dots_summarise) %>%
+            mutate(p_value_text = paste('p value =', round(p_value, 3)))
+          #ass_box_test$value <- test_result
+          multi_bm_test[[i]] <- test_result
+        } else {
+          #ass_box_test$value <- NULL
+          multi_bm_test[[i]] <- NULL
+        }
+        
+      }
+      return(multi_bm_test)
+      
+    })
+    
     # ggplot object for boxplot
     ass_box_plot <- reactiveValues(value = NULL)
     ass_box_plot_data <- reactiveValues(value = NULL)
@@ -6386,6 +6472,104 @@ shinyServer(function(input, output, session) {
             ass_box_plot_data$value <- NULL
         }
     })
+    
+    # ggplot boxplot object for multi biomarker output  
+    #ass_box_m_plot_data <- reactiveValues(value = NULL)
+    ass_box_m_plot <- reactive({
+      
+      req(!is_blank(input$ass_download_plot_multibmk))
+
+      #Calculate test p values
+      tmp <- ass_box_m_test()
+      ## object to save all the data frame for each biomarker;
+      multi_bm_obj <- list()
+      unique_bmk <- c(unique(input$ass_download_plot_multibmk))
+      data <- ass_box_data$value
+      
+      
+      for (i in unique_bmk){
+        multi_bm1 <- data[data[[param_col]] == i, , drop = F]
+        
+        if(all(!is_blank(multi_bm1), nrow(multi_bm1) > 0)) {
+          if(is_blank(ass_box_facet_rlevs$value)) facet_r_levels <- NULL
+          else {
+            facet_r_levels <- setNames(
+              ass_box_facet_rlevs$value,
+              paste0(input$ass_box_facet_r, ': ',
+                     ass_box_facet_rlevs$value)
+            )
+          }
+          if(is_blank(ass_box_facet_clevs$value)) facet_c_levels <- NULL
+          else {
+            facet_c_levels <- setNames(
+              ass_box_facet_clevs$value,
+              paste0(input$ass_box_facet_c, ': ',
+                     ass_box_facet_clevs$value)
+            )
+          }
+          
+          #x_lab <- r_format(ass_box_xlab$value, tnf$ass_current)
+          #y_lab <- r_format(ass_box_ylab$value, tnf$ass_current)
+          #plot_title <- r_format(ass_box_title$value, tnf$ass_current)
+          
+          x_lab <- ass_box_xlab$value
+          y_lab <- ass_box_ylab$value
+          if (ass_box_title$value == 'Study: {Study}') {
+            plot_title <- i
+            
+          }
+          else if (ass_box_title$value != 'Study: {Study}') {
+            plot_title <- paste0(ass_box_title$value, i , sep = '\n')
+          }
+          
+          
+          plot_obj <- gg_boxplot(
+            multi_bm1, input$ass_box_x, input$ass_box_y, subj_col,
+            facet_r = input$ass_box_facet_r,
+            facet_c = input$ass_box_facet_c,
+            facet_r_levels = facet_r_levels, facet_c_levels = facet_c_levels,
+            color_var = input$ass_box_group,
+            x_lab = x_lab, y_lab = y_lab, title = plot_title,
+            x_limit = ass_box_brush_range$xlim,
+            y_limit = ass_box_brush_range$ylim,
+            y_log = ass_box_log_y$value,
+            add_points = ass_box_add_points$value, point_shape = 19,
+            add_legend = TRUE, legend_pos = 'bottom',
+            reference_hline = ass_box_refline$value,
+            # text_content = NULL, text_pos = 'topleft',
+            # xtick_angle = 0, xtick_align = 'center',
+            add_sample_size = ass_box_add_sample_size$value,
+            grids = 'on', add_label = ass_box_show_subjid$value,
+            return_data = TRUE
+          )
+          plot_ <- plot_obj$plot
+          if(!is.null(tmp[[i]])) {
+            if(!is_blank(input$ass_box_x) && !is_blank(input$ass_box_group))
+              hjust = 0.5
+            else hjust = -0.2
+            plot_ <- plot_ +
+              geom_text(data = tmp[[i]],
+                        aes(x, y, label = p_value_text),
+                        inherit.aes = FALSE,
+                        hjust = hjust, vjust = 1.5)
+          }
+          #ass_box_plot$value <- plot_
+          multi_bm_obj[[i]] <- plot_
+          #ass_box_plot_data$value <- plot_obj$data
+        } else {
+          #ass_box_plot$value <- NULL
+          multi_bm_obj[[i]] <- NULL
+          #ass_box_plot_data$value <- NULL
+        }
+      }
+
+      return(multi_bm_obj)
+    })
+    
+    
+    
+    
+    
     
     output$ass_box_output <- renderUI({
         req(ass_box_data$value)
@@ -7175,11 +7359,30 @@ shinyServer(function(input, output, session) {
             width = input$ass_download_plot_width
             dev <- plot_dev(tolower(input$ass_download_plot_format), file,
                             dpi = 600)
-            dev(file = file, width = width, height = height)
-            plot_ <- add_footnote(ass_box_plot$value,
-                                  trimws(ass_box_footnote_in$value))
-            grid.draw(plot_)
-            dev.off()
+            #####################################
+            # Single/ Multiple biomarker plot output
+            #####################################
+            if(is_blank(input$ass_download_plot_multibmk) || (!is_blank(input$ass_download_plot_multibmk) && length(input$ass_box_bmk) > 1)){
+              
+              dev(file = file, width = width, height = height)
+              
+              
+              plot_ <- add_footnote(ass_box_plot$value,
+                                    trimws(ass_box_footnote_in$value))
+              
+              grid.draw(plot_)
+              dev.off()
+            }
+            else if(!is_blank(input$ass_download_plot_multibmk)){
+              pdf(file = file, width = width, height = height)
+              for (i in 1:length(c(unique(input$ass_download_plot_multibmk)))){
+                temp <- ass_box_m_plot()
+                plot_ <- temp[[i]]
+                print(plot_)
+              }
+              dev.off()
+            }  
+            
         }
     )
     # download button widget on download page for correlation matrix plot
