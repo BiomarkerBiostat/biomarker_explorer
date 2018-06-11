@@ -6333,7 +6333,6 @@ shinyServer(function(input, output, session) {
     ## 
     # equality test result for multi boxplot output
     ass_box_m_test <- reactive({
- 
       data <- ass_box_data$value
       ## object to save all the test data frame for each biomarker;
       multi_bm_test <- list()
@@ -6372,6 +6371,11 @@ shinyServer(function(input, output, session) {
             names(ass_box_tests)[ass_box_tests == input$ass_box_test],
             'test', sep = '.'
           )
+          #=========Added By WANGSHU
+          if(test_method == 'jonckheere.test') {
+            multi_bm1[[group_var]] <- ordered(multi_bm1[[group_var]])
+            test_method <- 'JonckheereTerpstraTest'
+          }
           test_func <- match.fun(test_method)
           if(is_blank(dots_group)) {
             p_value_expr <- lazyeval::interp(
@@ -6484,7 +6488,6 @@ shinyServer(function(input, output, session) {
     })
     
     # ggplot boxplot object for multi biomarker output  
-    #ass_box_m_plot_data <- reactiveValues(value = NULL)
     ass_box_m_plot <- reactive({
       
       req(!is_blank(input$ass_download_plot_multibmk))
