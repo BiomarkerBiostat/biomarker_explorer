@@ -132,7 +132,11 @@ summary_table_2d <- function(data_, row_var, col_var,
 summary_matrix <- function(data_, row_var, col_var = NULL, val_var = NULL,
                            col_totals = NULL, name_totals = NULL,
                            func_list = c('Min' = min, 'Median' = median,
-                                         'Mean' = mean, 'Max' = max)) {
+                                         'Mean' = mean, 'Max' = max)
+                           
+                           , pval
+                           , pval_loc
+                           ) {
     all_columns <- names(data_)
     #stopifnot(row_var %in% all_columns )
     if(!is.factor(data_[[row_var]]))
@@ -156,6 +160,14 @@ summary_matrix <- function(data_, row_var, col_var = NULL, val_var = NULL,
         summary_table <- matrix(fapply(
             func_list, data_split, transpose = TRUE
         ), ncol = 1)
+        
+        ###### ADDED by WANGSHU
+        if(!is_blank(pval)) {
+          digits = 3
+          summary_table <- rbind(summary_table, round(pval, digits))
+        }
+        ###### END ADDED by WANGSHU
+        
     } else {
         if(is_blank(val_var))
             val_var <- base::setdiff(all_columns, c(row_var, col_var))
@@ -200,6 +212,29 @@ summary_matrix <- function(data_, row_var, col_var = NULL, val_var = NULL,
         summary_table <- apply(
             data_split, 2, fapply, func_list = func_list, transpose = TRUE
         )
+        
+        ### ADDED by WANGSHU
+        if(!is_blank(pval)) {
+          digits = 3
+          pval = round(pval, digits)
+          n_funcs <- length(func_list)
+          
+          if(pval_loc == "EACH") {
+            temp <- matrix(0, (n_funcs + 1) * length(unique(data_[[row_var]])), length(unique(data_[[col_var]])))
+            i = 1
+            j = 1
+            while (i <= (n_funcs + 1) * length(unique(data_[[row_var]]))) {
+              temp[i:(i + n_funcs - 1), ] <- summary_table[j:(j + n_funcs - 1), ]
+              temp[i + n_funcs, ] <- c(pval[as.integer(j/n_funcs + 1)], rep(NA, length(unique(data_[[col_var]])) - 1))
+              i = i + n_funcs + 1
+              j = j + n_funcs
+            }
+            summary_table <- temp
+          } else {
+            summary_table <- rbind(summary_table, pval)
+          }
+        }
+        ### END ADDED by WANGSHU
     }
 
     return(summary_table)
@@ -216,6 +251,10 @@ summary_table_all <- function(data_, row_var, row_names = '',
                               func_list = c('Min' = min, 'Median' = median,
                                             'Mean' = mean, 'Max' = max),
                               func_names = names(func_list),
+                              
+                              pval,
+                              pval_loc,
+                              
                               caption = '', footnote = '', mdgrp = '',
                               rowlabel = '', visit_header_space = 4,name_N='Y',
                               format = 'html') {
@@ -274,6 +313,11 @@ summary_table_all <- function(data_, row_var, row_names = '',
         data_, row_var, col_var = col_var, val_var = val_var,
         col_totals = col_totals, name_totals = name_totals,
         func_list = func_list
+        
+        ############# Added by WANGSHU: add pvalues to the last line of table
+        , pval
+        , pval_loc
+        ############# END added by WANGSHU
     )
     if(!is_blank(col_var)) colnames(summary_tbl) <- col_names
     
@@ -325,6 +369,20 @@ summary_table_all <- function(data_, row_var, row_names = '',
             rgroup <- row_names
             n_rgroup <- rep(n_funcs, row_nlevels)
         }
+        
+        #### ADDED by WANGSHU
+        if (pval_loc == "LAST") {
+          rgroup <- c(rgroup, "Statistical Test")
+          rnames <- c(rnames, "Pvalue")
+          n_rgroup <- c(n_rgroup, 1)
+        }
+        
+        if(pval_loc == "EACH") {
+          rnames <- rep(c(func_names, "Pvalue"), row_nlevels)
+          n_rgroup <- rep(n_funcs + 1, row_nlevels)
+        }
+        ### END ADDED by WANGSHU
+        
         html <- invisible(
             htmlTable::htmlTable(
                 summary_tbl, header = header, rnames = rnames,
