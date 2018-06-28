@@ -371,15 +371,17 @@ summary_table_all <- function(data_, row_var, row_names = '',
         }
         
         #### ADDED by WANGSHU
-        if (pval_loc == "LAST") {
-          rgroup <- c(rgroup, "Statistical Test")
-          rnames <- c(rnames, "Pvalue")
-          n_rgroup <- c(n_rgroup, 1)
-        }
-        
-        if(pval_loc == "EACH") {
-          rnames <- rep(c(func_names, "Pvalue"), row_nlevels)
-          n_rgroup <- rep(n_funcs + 1, row_nlevels)
+        if(!is_blank(pval)) {
+          if (pval_loc == "LAST") {
+            rgroup <- c(rgroup, "Statistical Test")
+            rnames <- c(rnames, "Pvalue")
+            n_rgroup <- c(n_rgroup, 1)
+          }
+          
+          if(pval_loc == "EACH") {
+            rnames <- rep(c(func_names, "Pvalue"), row_nlevels)
+            n_rgroup <- rep(n_funcs + 1, row_nlevels)
+          }
         }
         ### END ADDED by WANGSHU
         
