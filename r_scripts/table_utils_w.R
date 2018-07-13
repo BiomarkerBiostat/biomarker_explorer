@@ -134,8 +134,8 @@ summary_matrix <- function(data_, row_var, col_var = NULL, val_var = NULL,
                            func_list = c('Min' = min, 'Median' = median,
                                          'Mean' = mean, 'Max' = max)
                            
-                           , pval 
-                           , pval_loc = ''
+                           , pval
+                           , pval_loc
                            ) {
     all_columns <- names(data_)
     #stopifnot(row_var %in% all_columns )
@@ -162,7 +162,7 @@ summary_matrix <- function(data_, row_var, col_var = NULL, val_var = NULL,
         ), ncol = 1)
         
         ###### ADDED by WANGSHU
-        if(!is_blank(pval) && !is.null(pval)) {
+        if(!is_blank(pval)) {
           digits = 3
           summary_table <- rbind(summary_table, round(pval, digits))
         }
@@ -214,7 +214,7 @@ summary_matrix <- function(data_, row_var, col_var = NULL, val_var = NULL,
         )
         
         ### ADDED by WANGSHU
-        if(!is_blank(pval) && !is.null(pval)) {
+        if(!is_blank(pval)) {
           digits = 3
           pval = round(pval, digits)
           n_funcs <- length(func_list)
@@ -225,7 +225,7 @@ summary_matrix <- function(data_, row_var, col_var = NULL, val_var = NULL,
             j = 1
             while (i <= (n_funcs + 1) * length(unique(data_[[row_var]]))) {
               temp[i:(i + n_funcs - 1), ] <- summary_table[j:(j + n_funcs - 1), ]
-              temp[i + n_funcs, ] <- c(pval[as.integer(j/n_funcs + 1)], rep(' ', length(unique(data_[[col_var]])) - 1))
+              temp[i + n_funcs, ] <- c(pval[as.integer(j/n_funcs + 1)], rep(NA, length(unique(data_[[col_var]])) - 1))
               i = i + n_funcs + 1
               j = j + n_funcs
             }
@@ -252,8 +252,8 @@ summary_table_all <- function(data_, row_var, row_names = '',
                                             'Mean' = mean, 'Max' = max),
                               func_names = names(func_list),
                               
-                              pval ='',
-                              pval_loc ='',
+                              pval,
+                              pval_loc,
                               
                               caption = '', footnote = '', mdgrp = '',
                               rowlabel = '', visit_header_space = 4,name_N='Y',
@@ -315,8 +315,8 @@ summary_table_all <- function(data_, row_var, row_names = '',
         func_list = func_list
         
         ############# Added by WANGSHU: add pvalues to the last line of table
-        , pval 
-        , pval_loc 
+        , pval
+        , pval_loc
         ############# END added by WANGSHU
     )
     if(!is_blank(col_var)) colnames(summary_tbl) <- col_names
@@ -371,7 +371,7 @@ summary_table_all <- function(data_, row_var, row_names = '',
         }
         
         #### ADDED by WANGSHU
-        if(!is_blank(pval) && !is.null(pval)) {
+        if(!is_blank(pval)) {
           if (pval_loc == "LAST") {
             rgroup <- c(rgroup, "Statistical Test")
             rnames <- c(rnames, "Pvalue")
@@ -422,68 +422,9 @@ summary_table_all <- function(data_, row_var, row_names = '',
             add_col[idx_rtf] <- paste(rep(' ', visit_header_space), func_names)
             add_col[idx_grp] <- mdgrp 
         } else {
-            if (pval_loc == "LAST") {
-              summary_tbl_rtf <- do.call(
+            summary_tbl_rtf <- do.call(
                 rbind,
-                c(list(summary_tbl), as.list(rep('', row_nlevels+1)))
-              )
-              idx_na <- seq(1, nrow(summary_tbl_rtf), by = n_funcs + 1)
-              idx_rtf <- sort(setdiff(seq_len(nrow(summary_tbl_rtf)), idx_na)) 
-              idx_na <- idx_na + 1
-              idx_rtf <- idx_rtf + 1
-              #idx_grp <- idx_na
-              idx_grp <- c(1)
-              summary_tbl_rtf <- rbind(c(" "), summary_tbl_rtf)
-              summary_tbl_rtf[idx_rtf, ] <- summary_tbl
-              summary_tbl_rtf[idx_na, ] <- ''
-              summary_tbl_rtf[idx_grp, ] <- ''
-              add_col <- rep('', nrow(summary_tbl_rtf))
-              add_col[idx_na] <- row_levels
-              add_col[idx_rtf] <- paste(rep(' ', visit_header_space), func_names)
-              add_col[idx_grp] <- mdgrp       
-              
-              summary_tbl_rtf <- cbind(
-                ' ' = add_col,
-                summary_tbl_rtf
-              )
-              
-              summary_tbl_rtf[nrow(summary_tbl_rtf)-1, 1] <- "Statistical Test"
-              summary_tbl_rtf[nrow(summary_tbl_rtf), 1] <- "P Value"
-            
-          }else if (pval_loc == "EACH") {
-            #summary_table[is.na(summary_table)] <- "NA"
-            #summary_tbl[14, 2] = "NA"
-            summary_tbl_rtf <- do.call(
-              rbind,
-              c(list(summary_tbl), as.list(rep('', row_nlevels)))
-            )
-            
-            n_funcs < n_funcs + 1
-            idx_na <- seq(1, nrow(summary_tbl_rtf), by = n_funcs + 2)
-            idx_rtf <- sort(setdiff(seq_len(nrow(summary_tbl_rtf)), idx_na)) 
-            idx_na <- idx_na + 1
-            idx_rtf <- idx_rtf + 1
-            #idx_grp <- idx_na
-            idx_grp <- c(1)
-            summary_tbl_rtf <- rbind(c(" "), summary_tbl_rtf)
-            summary_tbl_rtf[idx_rtf, ] <- summary_tbl
-            #summary_tbl_rtf[idx_rtf, ] <- ''
-            summary_tbl_rtf[idx_na, ] <- ''
-            summary_tbl_rtf[idx_grp, ] <- ''
-            add_col <- rep('', nrow(summary_tbl_rtf))
-            add_col[idx_na] <- row_levels
-            func_names <- c(func_names, "P value")
-            add_col[idx_rtf] <- paste(rep(' ', visit_header_space), func_names)
-            add_col[idx_grp] <- mdgrp       
-
-            summary_tbl_rtf <- cbind(
-              ' ' = add_col,
-              summary_tbl_rtf
-            )
-          } else {
-            summary_tbl_rtf <- do.call(
-              rbind,
-              c(list(summary_tbl), as.list(rep('', row_nlevels)))
+                c(list(summary_tbl), as.list(rep('', row_nlevels)))
             )
             idx_na <- seq(1, nrow(summary_tbl_rtf), by = n_funcs + 1)
             idx_rtf <- sort(setdiff(seq_len(nrow(summary_tbl_rtf)), idx_na)) 
@@ -498,16 +439,12 @@ summary_table_all <- function(data_, row_var, row_names = '',
             add_col <- rep('', nrow(summary_tbl_rtf))
             add_col[idx_na] <- row_levels
             add_col[idx_rtf] <- paste(rep(' ', visit_header_space), func_names)
-            add_col[idx_grp] <- mdgrp       
-            
-            summary_tbl_rtf <- cbind(
-              ' ' = add_col,
-              summary_tbl_rtf
-            )
-            
-            
-          }
+            add_col[idx_grp] <- mdgrp
         }
+        summary_tbl_rtf <- cbind(
+            ' ' = add_col,
+            summary_tbl_rtf
+        )
         dimnames(summary_tbl_rtf) <- list(
             seq_len(nrow(summary_tbl_rtf)),
             c(' ', ternary(is_blank(col_var), 'Value', col_names))

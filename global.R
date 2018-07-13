@@ -1,7 +1,7 @@
 #------------------------------#
-# Biomarker Explorer shiny 2018#
+# Biomarker Explorer shiny app #
 #------------------------------#
-print("testest")
+
 # global.R
 
 #-----------------------------------------------
@@ -136,14 +136,14 @@ os_time_col <- 'OSTIME'
 os_event_col <- 'OSEVENT'
 
 required_cols <- c(
-  study_col, subj_col, param_col, aval_col, base_col,
-  chg_col, pchg_col, prchg_col, xvar_col, xlabel_col
+    study_col, subj_col, param_col, aval_col, base_col,
+    chg_col, pchg_col, prchg_col, xvar_col, xlabel_col
 )
 
 bmk_value_name_dict <- list(
-  'AVAL' = '', 'BASE' = 'Baseline', 'CHG' = 'Change from Baseline',
-  'PCHG' = '% Baseline',
-  'PRCHG' = 'Proportion of Baseline'
+    'AVAL' = '', 'BASE' = 'Baseline', 'CHG' = 'Change from Baseline',
+    'PCHG' = '% Baseline',
+    'PRCHG' = 'Proportion of Baseline'
 )
 
 # footnote_append <- paste(
@@ -154,11 +154,11 @@ bmk_value_name_dict <- list(
 # )
 
 default_footnote_lines <- function() {
-  paste(
-    paste('Date:', format(Sys.time(), format = '%d%b%Y %H:%M')),
-    'Produced by Biomarker Explorer Version 1',
-    sep = '\n'
-  )
+    paste(
+        paste('Date:', format(Sys.time(), format = '%d%b%Y %H:%M')),
+        'Produced by Biomarker Explorer Version 1',
+        sep = '\n'
+    )
 }
 
 
@@ -181,16 +181,16 @@ default_footnote_lines <- function() {
 
 # accepted file format list
 accepted_file_format <- c(
-  'text/csv',
-  'text/comma-separated-values',
-  'text/tab-separated-values',
-  'text/plain',
-  '.csv',
-  '.tsv',
-  '.RData',
-  '.sas7bdat',
-  '.xls',
-  '.xlsx'
+    'text/csv',
+    'text/comma-separated-values',
+    'text/tab-separated-values',
+    'text/plain',
+    '.csv',
+    '.tsv',
+    '.RData',
+    '.sas7bdat',
+    '.xls',
+    '.xlsx'
 )
 template_file <- 'input_data_template.xlsx'
 user_manual <- 'Rshiny_Biomarker_Explorer_User_Manual_V0.4.pdf'
@@ -206,14 +206,14 @@ quote_default <- '"'
 
 # note message
 message <- tags$div(
-  tags$p('Please note that the following file types are permitted:'),
-  tags$ul(
-    tags$li('RData'),
-    tags$li('txt'),
-    tags$li('csv / tsv'),
-    tags$li('xlsx / xls'),
-    tags$li('sas7bdat')
-  )
+    tags$p('Please note that the following file types are permitted:'),
+    tags$ul(
+        tags$li('RData'),
+        tags$li('txt'),
+        tags$li('csv / tsv'),
+        tags$li('xlsx / xls'),
+        tags$li('sas7bdat')
+    )
 )
 
 # number of rows of 'Variable' and 'Value' input to perform data subsetting
@@ -225,7 +225,7 @@ file_subset_num_cond <- 10L
 #-----------------------------------------------
 time_y_list <- c(aval_col, base_col, chg_col, pchg_col, prchg_col)
 time_output_list <- c('Boxplot', 'Mean + SE plot', 'Mean + SD plot',
-                      'Median + IQR plot', 'Spaghetti plot', 'Summary table')
+                     'Median + IQR plot', 'Spaghetti plot', 'Summary table')
 time_graph_list <- c('Boxplot', 'Mean + SE plot', 'Mean + SD plot',
                      'Median + IQR plot', 'Spaghetti plot')
 time_ngroups_threshold <- 20L
@@ -249,8 +249,8 @@ time_jitter_factor <- 0.5
 
 study_col <- 'STUDYID'
 ass_type_list <- c(
-  'Histogram', 'Scatter plot', 'Box plot', 'Correlation matrix',
-  'Contingency table'
+    'Histogram', 'Scatter plot', 'Box plot', 'Correlation matrix',
+    'Contingency table'
 )
 ass_y_list <- c(aval_col, base_col, chg_col, pchg_col, prchg_col)
 ass_add_line_types <- c('Linear regression line', 'Loess curve', 'Identity line')
@@ -310,28 +310,28 @@ sheet_names <- list(time = 'Time Profiling', ass = 'Association', fn = 'fn')
 
 # column names in the output data sheet for time-profiling graph
 out_time_cols <- c(
-  'FileKey', 'TFLT', 'TFLN', 'OutputType', 'Study', 'Cohort', 'Biomarker',
-  'YVariable', 'LogY', 'Group', 'GroupLevels', 'FacetRow', 'FacetRowLevels',
-  'FacetColumn', 'FacetColumnLevels', 'Xmin', 'Xmax', 'Ymin', 'Ymax',
-  'PlotFormat', 'PlotHeight', 'PlotWidth', 'PlotResolution', 'XTickVar',
-  'TableTitle', 'TableFootnote', 'TableDecimal', 'TableColumnTotals',
-  'TableColumnTotalNames', 'TableChangeFromBaseline', 'PlotTitle', 
-  'PlotXLabel', 'PlotYLabel', 'PlotFootnote', 'XTickAngle', 'ReferenceLine',
-  'IncludeSampleSize', 'IncludePoints', 'IncludeSubjectID', 'Colors',
-  'LineTypes', 'SubsetExpression'
+    'FileKey', 'TFLT', 'TFLN', 'OutputType', 'Study', 'Cohort', 'Biomarker',
+    'YVariable', 'LogY', 'Group', 'GroupLevels', 'FacetRow', 'FacetRowLevels',
+    'FacetColumn', 'FacetColumnLevels', 'Xmin', 'Xmax', 'Ymin', 'Ymax',
+    'PlotFormat', 'PlotHeight', 'PlotWidth', 'PlotResolution', 'XTickVar',
+    'TableTitle', 'TableFootnote', 'TableDecimal', 'TableColumnTotals',
+    'TableColumnTotalNames', 'TableChangeFromBaseline', 'PlotTitle', 
+    'PlotXLabel', 'PlotYLabel', 'PlotFootnote', 'XTickAngle', 'ReferenceLine',
+    'IncludeSampleSize', 'IncludePoints', 'IncludeSubjectID', 'Colors',
+    'LineTypes', 'SubsetExpression'
 )
 
 # column names in the output data sheet for association graph/table
 out_ass_cols <- c(
-  'FileKey', 'TFLT', 'TFLN', 'OutputType', 'Study', 'Cohort', 'BiomarkerX',
-  'VariableX', 'LevelsX', 'VisitsX', 'LogX', 'BiomarkerY', 'VariableY',
-  'LevelsY', 'VisitsY', 'LogY', 'Group', 'GroupLevels', 'FacetRow',
-  'FacetRowLevels', 'FacetColumn', 'FacetColumnLevels', 'CorrelationMatrixType',
-  'CorrelationMatrixPlot', 'StatisticalTest', 'TablePercentage', 'TableTitle',
-  'TableFootnote', 'PlotFormat', 'PlotHeight', 'PlotWidth', 'PlotResolution',
-  'PlotTitle', 'PlotXLabel', 'PlotYLabel', 'PlotFootnote', 'HistogramGeom',
-  'IncludeSampleSize', 'IncludeSubjectID', 'IncludePoints',
-  'IncludeConfidenceInterval', 'AddLines', 'SubsetExpression'
+    'FileKey', 'TFLT', 'TFLN', 'OutputType', 'Study', 'Cohort', 'BiomarkerX',
+    'VariableX', 'LevelsX', 'VisitsX', 'LogX', 'BiomarkerY', 'VariableY',
+    'LevelsY', 'VisitsY', 'LogY', 'Group', 'GroupLevels', 'FacetRow',
+    'FacetRowLevels', 'FacetColumn', 'FacetColumnLevels', 'CorrelationMatrixType',
+    'CorrelationMatrixPlot', 'StatisticalTest', 'TablePercentage', 'TableTitle',
+    'TableFootnote', 'PlotFormat', 'PlotHeight', 'PlotWidth', 'PlotResolution',
+    'PlotTitle', 'PlotXLabel', 'PlotYLabel', 'PlotFootnote', 'HistogramGeom',
+    'IncludeSampleSize', 'IncludeSubjectID', 'IncludePoints',
+    'IncludeConfidenceInterval', 'AddLines', 'SubsetExpression'
 )
 
 # column names in the output data sheet for footnote
@@ -343,13 +343,13 @@ out_fn_cols <- c(out_fn_num_col, out_fn_text_col)
 out_table_convert <- TRUE
 
 out_tnf_names <- list(
-  'Time Profiling' = out_time_cols,
-  'Association' = out_ass_cols,
-  'fn' = out_fn_cols
+    'Time Profiling' = out_time_cols,
+    'Association' = out_ass_cols,
+    'fn' = out_fn_cols
 )
 
 
-
+    
 
 
 

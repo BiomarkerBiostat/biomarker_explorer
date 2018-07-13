@@ -3027,7 +3027,7 @@ shinyServer(function(input, output, session) {
   
   
   #-----------------------------------------------
-  # Association graph page hi
+  # Association graph page
   #-----------------------------------------------
   
   # a reactive data set based on the specification of study and cohort
@@ -6742,27 +6742,45 @@ shinyServer(function(input, output, session) {
             }
           }
         }
-      }
-      ### END ADDED by WANGSHU
-      summary_tbl <- summary_table_all(
-        data,
-        row_var = input$ass_box_x,
-        col_var = input$ass_box_group, val_var = input$ass_box_y,
-        
-        col_totals = ,
-        name_totals = ,
-        n_in_header = FALSE, subj_col = subj_col,
-        baseline_name = NULL,
-        add_cfb = , cfb_var =,
-        func_list = summary_func,
-        
-        pval = pval,
-        pval_loc = "EACH",
-        
-        caption = '',
-        footnote = '',
-        rowlabel = '', format = 'html'
-      )
+          ### END ADDED by WANGSHU
+          summary_tbl <- summary_table_all(
+            data,
+            row_var = input$ass_box_x,
+            col_var = input$ass_box_group, val_var = input$ass_box_y,
+            
+            col_totals = ,
+            name_totals = ,
+            n_in_header = FALSE, subj_col = subj_col,
+            baseline_name = NULL,
+            add_cfb = , cfb_var =,
+            func_list = summary_func,
+            
+            pval = pval,
+            pval_loc = "EACH",
+            
+            caption = '',
+            footnote = '',
+            rowlabel = '', format = 'html'
+          )
+      }else{
+          
+        summary_tbl <- summary_table_all(
+          data,
+          row_var = input$ass_box_x,
+          col_var = input$ass_box_group, val_var = input$ass_box_y,
+          
+          col_totals = ,
+          name_totals = ,
+          n_in_header = FALSE, subj_col = subj_col,
+          baseline_name = NULL,
+          add_cfb = , cfb_var =,
+          func_list = summary_func,
+          caption = '',
+          footnote = '',
+          rowlabel = '', format = 'html'
+        )
+        }
+
     }
     # Summary table with grouping by input$ass_row;
     else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && is_blank(input$ass_box_group) && !is_blank(input$ass_box_facet_r) && is_blank(input$ass_box_facet_c)){
@@ -6815,6 +6833,7 @@ shinyServer(function(input, output, session) {
       ### ADDED by WANGSHU
       pval = (ass_box_test$value)$p_value
       if(!is_blank(input$ass_box_test)) {
+
         pval_vec = (ass_box_test$value)$p_value
         x_vec = (ass_box_test$value)$x
         n_x = length(unique(data[[input$ass_box_x]]))
@@ -6830,18 +6849,16 @@ shinyServer(function(input, output, session) {
             }
           }
         }
-      }
-      ### END ADDED by WANGSHU
-      
-      ii = 1
-      for (i in unique_fr) {
-        #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
-        tmp_data <- data[
-          data[[input$ass_box_facet_r]] == i,
-          , drop = F
-          ]
+        ### END ADDED by WANGSHU
         
-        if(!is_blank(input$ass_box_test)) {
+        ii = 1
+        for (i in unique_fr) {
+          #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
+          tmp_data <- data[
+            data[[input$ass_box_facet_r]] == i,
+            , drop = F
+            ]
+          
           d <- summary_table_all(
             tmp_data, row_var = input$ass_box_x,
             col_var = input$ass_box_group, val_var = input$ass_box_y,
@@ -6861,7 +6878,15 @@ shinyServer(function(input, output, session) {
           )
           summary_tbl = rbind(summary_tbl,i,d)
           ii = ii + n_x
-        } else {
+        }
+      }else{
+
+        for (i in unique_fr) {
+          #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
+          tmp_data <- data[
+            data[[input$ass_box_facet_r]] == i,
+            , drop = F
+            ]  
           d <- summary_table_all(
             tmp_data, row_var = input$ass_box_x,
             col_var = input$ass_box_group, val_var = input$ass_box_y,
@@ -6871,18 +6896,14 @@ shinyServer(function(input, output, session) {
             baseline_name = NULL,
             add_cfb = , cfb_var =,
             func_list = summary_func,
-            
-            pval = pval,
-            pval_loc = "EACH",
-            
             caption = '',
             footnote = '',
             rowlabel = '', format = 'html'
           )
           summary_tbl = rbind(summary_tbl,i,d)
         }
-        
       }
+
       
     }
     
@@ -6896,9 +6917,8 @@ shinyServer(function(input, output, session) {
       d = NULL
       
       ### ADDED by WANGSHU
-      pval = (ass_box_test$value)$p_value
+      pval_vec = (ass_box_test$value)$p_value
       if(!is_blank(input$ass_box_test)) {
-        pval_vec = (ass_box_test$value)$p_value
         x_vec = (ass_box_test$value)$x
         n_x = length(unique(data[[input$ass_box_x]]))
         i = 1
@@ -6913,18 +6933,16 @@ shinyServer(function(input, output, session) {
             }
           }
         }
-      }
-      ### END ADDED by WANGSHU
-      
-      ii = 1
-      
-      for (i in unique_fc) {
-        #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
-        tmp_data <- data[
-          data[[input$ass_box_facet_c]] == i,
-          , drop = F
-          ]
-        if(!is_blank(input$ass_box_test)) {
+        ### END ADDED by WANGSHU
+        
+        ii = 1
+        
+        for (i in unique_fc) {
+          #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
+          tmp_data <- data[
+            data[[input$ass_box_facet_c]] == i,
+            , drop = F
+            ]  
           d <- summary_table_all(
             tmp_data, row_var = input$ass_box_x,
             col_var = input$ass_box_group, val_var = input$ass_box_y,
@@ -6944,7 +6962,14 @@ shinyServer(function(input, output, session) {
           )
           summary_tbl = rbind(summary_tbl,i,d)
           ii = ii + n_x
-        } else {
+        }
+      }else{
+        for (i in unique_fc) {
+          #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
+          tmp_data <- data[
+            data[[input$ass_box_facet_c]] == i,
+            , drop = F
+            ]  
           d <- summary_table_all(
             tmp_data, row_var = input$ass_box_x,
             col_var = input$ass_box_group, val_var = input$ass_box_y,
@@ -6954,10 +6979,6 @@ shinyServer(function(input, output, session) {
             baseline_name = NULL,
             add_cfb = , cfb_var =,
             func_list = summary_func,
-            
-            pval = pval,
-            pval_loc = "EACH",
-            
             caption = '',
             footnote = '',
             rowlabel = '', format = 'html'
@@ -6984,47 +7005,26 @@ shinyServer(function(input, output, session) {
         tmp_data <- data[
           data[[input$ass_box_facet_r]] == i,
           , drop = F
-          ]
-        if(!is_blank(input$ass_box_test)) {
-          d <- summary_table_all(
-            tmp_data, row_var = input$ass_box_x,
-            col_var = input$ass_box_facet_c, val_var = input$ass_box_y,
-            col_totals = ,
-            name_totals = ,
-            n_in_header = FALSE, subj_col = subj_col,
-            baseline_name = NULL,
-            add_cfb = , cfb_var =,
-            func_list = summary_func,
+          ]  
+        d <- summary_table_all(
+          tmp_data, row_var = input$ass_box_x,
+          col_var = input$ass_box_facet_c, val_var = input$ass_box_y,
+          col_totals = ,
+          name_totals = ,
+          n_in_header = FALSE, subj_col = subj_col,
+          baseline_name = NULL,
+          add_cfb = , cfb_var =,
+          func_list = summary_func,
           
-            pval = ((ass_box_test$value)$p_value)[ii:(ii + n_fc - 1)],
-            pval_loc = "LAST",
+          pval = ((ass_box_test$value)$p_value)[ii:(ii + n_fc - 1)],
+          pval_loc = "LAST",
           
-            caption = '',
-            footnote = '',
-            rowlabel = '', format = 'html'
-          )
-          summary_tbl = rbind(summary_tbl,i,d)
-          ii = ii + n_fc
-        } else {
-          d <- summary_table_all(
-            tmp_data, row_var = input$ass_box_x,
-            col_var = input$ass_box_facet_c, val_var = input$ass_box_y,
-            col_totals = ,
-            name_totals = ,
-            n_in_header = FALSE, subj_col = subj_col,
-            baseline_name = NULL,
-            add_cfb = , cfb_var =,
-            func_list = summary_func,
-            
-            pval = pval,
-            pval_loc = "EACH",
-            
-            caption = '',
-            footnote = '',
-            rowlabel = '', format = 'html'
-          )
-          summary_tbl = rbind(summary_tbl,i,d)
-        }
+          caption = '',
+          footnote = '',
+          rowlabel = '', format = 'html'
+        )
+        summary_tbl = rbind(summary_tbl,i,d)
+        ii = ii + n_fc
       }
     }
     # Summary table with grouping by input$ass_box_group and input$ass_box_facet_c and input$ass_box_facet_r;
@@ -7036,21 +7036,19 @@ shinyServer(function(input, output, session) {
       d = NULL
       
       ### ADDED by WANGSHU
-      pval = (ass_box_test$value)$p_value
-      if(!is_blank(input$ass_box_test)) {
-        pval_vec = (ass_box_test$value)$p_value
-        x_vec = (ass_box_test$value)$x
-        n_x = length(unique(data[[input$ass_box_x]]))
-        i = 1
-        pval = NULL
-        while(length(pval) <= length(unique_fr)*length(unique_fc)*n_x) {
-          for(j in 1:n_x) {
-            if(!is.na(x_vec[i]) && x_vec[i] == j) {
-              pval = c(pval, pval_vec[i])
-              i = i + 1
-            } else {
-              pval = c(pval, NA)
-            }
+      pval_vec = (ass_box_test$value)$p_value
+      x_vec = (ass_box_test$value)$x
+      n_x = length(unique(data[[input$ass_box_x]]))
+      #n_grp = length(unique(data[[input$ass_box_group]]))
+      i = 1
+      pval = NULL
+      while(length(pval) <= length(unique_fr)*length(unique_fc)*n_x) {
+        for(j in 1:n_x) {
+          if(!is.na(x_vec[i]) && x_vec[i] == j) {
+            pval = c(pval, pval_vec[i])
+            i = i + 1
+          } else {
+            pval = c(pval, NA)
           }
         }
       }
@@ -7071,49 +7069,27 @@ shinyServer(function(input, output, session) {
           tmp_data_c <- tmp_data_r[
             tmp_data_r[[input$ass_box_facet_c]] == j,
             , drop = F
-            ]
-          if(!is_blank(input$ass_box_test)) {
-            d_c <- summary_table_all(
-              tmp_data_c, row_var = input$ass_box_x,
-              col_var = input$ass_box_group, val_var = input$ass_box_y,
-              col_totals = ,
-              name_totals = ,
-              n_in_header = FALSE, subj_col = subj_col,
-              baseline_name = NULL,
-              add_cfb = , cfb_var =,
-              func_list = summary_func,
+            ]                
+          d_c <- summary_table_all(
+            tmp_data_c, row_var = input$ass_box_x,
+            col_var = input$ass_box_group, val_var = input$ass_box_y,
+            col_totals = ,
+            name_totals = ,
+            n_in_header = FALSE, subj_col = subj_col,
+            baseline_name = NULL,
+            add_cfb = , cfb_var =,
+            func_list = summary_func,
             
-              pval = pval[ii:(ii + n_x - 1)],
-              pval_loc = "EACH",
+            pval = pval[ii:(ii + n_x - 1)],
+            pval_loc = "EACH",
             
-              caption = '',
-              footnote = '',
-              rowlabel = '', format = 'html'
-            )
-            ij <- c(",")
-            summary_tbl_c = rbind(summary_tbl_c,i,ij,j, d_c)
-            ii = ii + n_x
-          } else {
-            d_c <- summary_table_all(
-              tmp_data_c, row_var = input$ass_box_x,
-              col_var = input$ass_box_group, val_var = input$ass_box_y,
-              col_totals = ,
-              name_totals = ,
-              n_in_header = FALSE, subj_col = subj_col,
-              baseline_name = NULL,
-              add_cfb = , cfb_var =,
-              func_list = summary_func,
-              
-              pval = pval,
-              pval_loc = "EACH",
-              
-              caption = '',
-              footnote = '',
-              rowlabel = '', format = 'html'
-            )
-            ij <- c(",")
-            summary_tbl_c = rbind(summary_tbl_c,i,ij,j, d_c)
-          }
+            caption = '',
+            footnote = '',
+            rowlabel = '', format = 'html'
+          )
+          ij <- c(",")
+          summary_tbl_c = rbind(summary_tbl_c,i,ij,j, d_c)
+          ii = ii + n_x
         }
         
         summary_tbl = rbind(summary_tbl,summary_tbl_c)
@@ -7127,6 +7103,912 @@ shinyServer(function(input, output, session) {
     req(ass_box_show$value)
     HTML(ass_box_summary())
   })    
+  
+  ################################################################
+  # Association summary table for box plot
+  ################################################################
+  
+  output$ass_download_sum_table <- downloadHandler(
+    filename = function() {
+      file_name <- paste0(
+        'asso_sum_table_', format(Sys.Date(),format = '%Y%m%d'),
+        '.', input$ass_download_sum_table_format
+      )
+      return(file_name)
+    },
+    content = function(file) {
+      req(ass_box_show$value)
+      req(!is.null(input$ass_box_x))
+      
+      data <- ass_box_data$value
+      dgt <- 2
+      if(input$ass_download_sum_table_format == 'csv') {
+          summary_func <- c(
+            'N' = n_nna,
+            'Mean (SD)' = partial(mean_sd_str, digits = dgt),
+            '%CV' = partial(coeff_var_str, digits = dgt),
+            'Median' = partial(median_str, digits = dgt),
+            'Q1, Q3' = partial(q1_q3_str, digits = dgt),
+            'Min, Max' = partial(min_max_str, digits = dgt)
+          )
+          if(isTRUE(input$time_to_log)) {
+            summary_func <- c(
+              summary_func,
+              'Geom Mean (%CV)' = partial(geo_mean_cv_str, digits = dgt),
+              'Mean (SD) of LN' = partial(mean_sd_ln_str, digits = dgt)
+            )
+          }
+          
+          data <- mutate(data, hist_sum_all = seq(0,0,nrow(data)-1))
+          # Summary table without grouping;
+          if(input$ass_type == 'Box plot' && is_blank(input$ass_box_x) && is_blank(input$ass_box_group) && is_blank(input$ass_box_facet_r) && is_blank(input$ass_box_facet_c)){
+            summary_tbl <- summary_table_all(
+              data, row_var = 'hist_sum_all',row_names = ' ',
+              col_var = , val_var = input$ass_box_y,
+              col_totals = ,
+              name_totals = ,
+              n_in_header = FALSE, subj_col = subj_col,
+              baseline_name = NULL,
+              add_cfb = , cfb_var = ,
+              func_list = summary_func,
+              caption = '',
+              footnote = '',
+              rowlabel = '', format = 'csv'
+            )
+            write.csv(summary_tbl, file = file, row.names = F, na = '')
+          }
+          # Summary table with grouping in x axis;
+          if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && is_blank(input$ass_box_group) && is_blank(input$ass_box_facet_r) && is_blank(input$ass_box_facet_c)){
+            summary_tbl <- summary_table_all(
+              data, row_var = input$ass_box_x,
+              col_var = , val_var = input$ass_box_y,
+              col_totals = ,
+              name_totals = ,
+              n_in_header = FALSE, subj_col = subj_col,
+              baseline_name = NULL,
+              add_cfb = , cfb_var = ,
+              func_list = summary_func,
+              
+              pval = (ass_box_test$value)$p_value,
+              pval_loc = "LAST",
+              
+              caption = '',
+              footnote = '',
+              rowlabel = '', format = 'csv'
+            )
+            write.csv(summary_tbl, file = file, row.names = F, na = '')
+          }
+          # Summary table with grouping by input$ass_box_group;
+          else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && !is_blank(input$ass_box_group) && is_blank(input$ass_box_facet_r) && is_blank(input$ass_box_facet_c)){
+            ### ADDED by WANGSHU
+            pval_vec = (ass_box_test$value)$p_value
+            x_vec = (ass_box_test$value)$x
+            n_x = length(unique(data[[input$ass_box_x]]))
+            i = 1
+            pval = NULL
+            while(length(pval) <= n_x) {
+              for(j in 1:n_x) {
+                if(!is.na(x_vec[i]) && x_vec[i] == j) {
+                  pval = c(pval, pval_vec[i])
+                  i = i + 1
+                } else {
+                  pval = c(pval, NA)
+                }
+              }
+            }
+            ### END ADDED by WANGSHU
+            summary_tbl <- summary_table_all(
+              data,
+              row_var = input$ass_box_x,
+              col_var = input$ass_box_group, val_var = input$ass_box_y,
+              
+              col_totals = ,
+              name_totals = ,
+              n_in_header = FALSE, subj_col = subj_col,
+              baseline_name = NULL,
+              add_cfb = , cfb_var =,
+              func_list = summary_func,
+              
+              pval = pval,
+              pval_loc = "EACH",
+              
+              caption = '',
+              footnote = '',
+              rowlabel = '', format = 'csv'
+            )
+            write.csv(summary_tbl, file = file, row.names = F, na = '')
+          }
+          # Summary table with grouping by input$ass_row;
+          else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && is_blank(input$ass_box_group) && !is_blank(input$ass_box_facet_r) && is_blank(input$ass_box_facet_c)){
+            summary_tbl <- summary_table_all(
+              data, row_var = input$ass_box_x,
+              col_var = input$ass_box_facet_r, val_var = input$ass_box_y,
+              col_totals = ,
+              name_totals = ,
+              n_in_header = FALSE, subj_col = subj_col,
+              baseline_name = NULL,
+              add_cfb = , cfb_var =,
+              func_list = summary_func,
+              
+              pval = (ass_box_test$value)$p_value,
+              pval_loc = "LAST",
+              
+              caption = '',
+              footnote = '',
+              rowlabel = '', format = 'csv'
+            )
+            write.csv(summary_tbl, file = file, row.names = F, na = '')
+          }
+          # Summary table with grouping by input$ass_column;
+          else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && is_blank(input$ass_box_group) && is_blank(input$ass_box_facet_r) && !is_blank(input$ass_box_facet_c)){
+            summary_tbl <- summary_table_all(
+              data, row_var = input$ass_box_x,
+              col_var = input$ass_box_facet_c, val_var = input$ass_box_y,
+              col_totals = ,
+              name_totals = ,
+              n_in_header = FALSE, subj_col = subj_col,
+              baseline_name = NULL,
+              add_cfb = , cfb_var =,
+              func_list = summary_func,
+              
+              pval = (ass_box_test$value)$p_value,
+              pval_loc = "LAST",
+              
+              caption = '',
+              footnote = '',
+              rowlabel = '', format = 'csv'
+            )
+            write.csv(summary_tbl, file = file, row.names = F, na = '')
+          }
+          
+          # Summary table with grouping by input$ass_box_group and input$ass_box_facet_r;
+          else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && !is_blank(input$ass_box_group) && !is_blank(input$ass_box_facet_r) && is_blank(input$ass_box_facet_c)){
+            # subset data into different dataframe by input$ass_box_facet_r
+            unique_fr <- c(unique(ass_box_facet_rlevs$value))
+            summary_tbl=NULL
+            d = NULL
+            
+            ### ADDED by WANGSHU
+            pval_vec = (ass_box_test$value)$p_value
+            x_vec = (ass_box_test$value)$x
+            n_x = length(unique(data[[input$ass_box_x]]))
+            i = 1
+            pval = NULL
+            while(length(pval) <= length(unique_fr)*n_x) {
+              for(j in 1:n_x) {
+                if(!is.na(x_vec[i]) && x_vec[i] == j) {
+                  pval = c(pval, pval_vec[i])
+                  i = i + 1
+                } else {
+                  pval = c(pval, NA)
+                }
+              }
+            }
+            ### END ADDED by WANGSHU
+            
+            ii = 1
+            for (i in unique_fr) {
+              #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
+              tmp_data <- data[
+                data[[input$ass_box_facet_r]] == i,
+                , drop = F
+                ]
+              
+              d <- summary_table_all(
+                tmp_data, row_var = input$ass_box_x,
+                col_var = input$ass_box_group, val_var = input$ass_box_y,
+                col_totals = ,
+                name_totals = ,
+                n_in_header = FALSE, subj_col = subj_col,
+                baseline_name = NULL,
+                add_cfb = , cfb_var =,
+                func_list = summary_func,
+                
+                pval = pval[ii:(ii + n_x - 1)],
+                pval_loc = "EACH",
+                
+                caption = '',
+                footnote = '',
+                rowlabel = '', format = 'csv'
+              )
+              summary_tbl = rbind(summary_tbl,i,d)
+              ii = ii + n_x
+            }
+            write.csv(summary_tbl, file = file, row.names = F, na = '')
+          }
+          
+          # Summary table with grouping by input$ass_box_group and input$ass_box_facet_c;
+          else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && !is_blank(input$ass_box_group) && is_blank(input$ass_box_facet_r) && !is_blank(input$ass_box_facet_c)){
+            # subset data into different dataframe by input$ass_box_facet_r
+            #facet_row_levls <- unique_na(data[[input$ass_box_facet_r]])
+            unique_fc <- c(unique(ass_box_facet_clevs$value))
+            #facet_col_dim = unique_fc
+            summary_tbl=NULL
+            d = NULL
+            
+            ### ADDED by WANGSHU
+            pval_vec = (ass_box_test$value)$p_value
+            x_vec = (ass_box_test$value)$x
+            n_x = length(unique(data[[input$ass_box_x]]))
+            i = 1
+            pval = NULL
+            while(length(pval) <= length(unique_fc)*n_x) {
+              for(j in 1:n_x) {
+                if(!is.na(x_vec[i]) && x_vec[i] == j) {
+                  pval = c(pval, pval_vec[i])
+                  i = i + 1
+                } else {
+                  pval = c(pval, NA)
+                }
+              }
+            }
+            ### END ADDED by WANGSHU
+            
+            ii = 1
+            
+            for (i in unique_fc) {
+              #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
+              tmp_data <- data[
+                data[[input$ass_box_facet_c]] == i,
+                , drop = F
+                ]  
+              d <- summary_table_all(
+                tmp_data, row_var = input$ass_box_x,
+                col_var = input$ass_box_group, val_var = input$ass_box_y,
+                col_totals = ,
+                name_totals = ,
+                n_in_header = FALSE, subj_col = subj_col,
+                baseline_name = NULL,
+                add_cfb = , cfb_var =,
+                func_list = summary_func,
+                
+                pval = pval[ii:(ii + n_x - 1)],
+                pval_loc = "EACH",
+                
+                caption = '',
+                footnote = '',
+                rowlabel = '', format = 'csv'
+              )
+              summary_tbl = rbind(summary_tbl,i,d)
+              ii = ii + n_x
+            }
+            write.csv(summary_tbl, file = file, row.names = F, na = '')
+          }
+          
+          # Summary table with grouping by input$ass_box_facet_c and input$ass_box_facet_r;
+          else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && is_blank(input$ass_box_group) && !is_blank(input$ass_box_facet_r) && !is_blank(input$ass_box_facet_c)){
+            # subset data into different dataframe by input$ass_box_facet_r
+            unique_fr <- c(unique(ass_box_facet_rlevs$value))
+            summary_tbl=NULL
+            d = NULL
+            
+            ### ADDED by WANGSHU
+            n_fc <- length(c(unique(ass_box_facet_clevs$value)))
+            ii = 1
+            ### END ADDED by WANGSHU
+            
+            for (i in unique_fr) {
+              #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
+              tmp_data <- data[
+                data[[input$ass_box_facet_r]] == i,
+                , drop = F
+                ]  
+              d <- summary_table_all(
+                tmp_data, row_var = input$ass_box_x,
+                col_var = input$ass_box_facet_c, val_var = input$ass_box_y,
+                col_totals = ,
+                name_totals = ,
+                n_in_header = FALSE, subj_col = subj_col,
+                baseline_name = NULL,
+                add_cfb = , cfb_var =,
+                func_list = summary_func,
+                
+                pval = ((ass_box_test$value)$p_value)[ii:(ii + n_fc - 1)],
+                pval_loc = "LAST",
+                
+                caption = '',
+                footnote = '',
+                rowlabel = '', format = 'csv'
+              )
+              summary_tbl = rbind(summary_tbl,i,d)
+              ii = ii + n_fc
+            }
+            write.csv(summary_tbl, file = file, row.names = F, na = '')
+          }
+          # Summary table with grouping by input$ass_box_group and input$ass_box_facet_c and input$ass_box_facet_r;
+          else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && !is_blank(input$ass_box_group) && !is_blank(input$ass_box_facet_r) && !is_blank(input$ass_box_facet_c)){
+            # subset data into different dataframe by input$ass_box_facet_r
+            unique_fr <- c(unique(ass_box_facet_rlevs$value))
+            unique_fc <- c(unique(ass_box_facet_clevs$value))
+            summary_tbl=NULL
+            d = NULL
+            
+            ### ADDED by WANGSHU
+            pval_vec = (ass_box_test$value)$p_value
+            x_vec = (ass_box_test$value)$x
+            n_x = length(unique(data[[input$ass_box_x]]))
+            #n_grp = length(unique(data[[input$ass_box_group]]))
+            i = 1
+            pval = NULL
+            while(length(pval) <= length(unique_fr)*length(unique_fc)*n_x) {
+              for(j in 1:n_x) {
+                if(!is.na(x_vec[i]) && x_vec[i] == j) {
+                  pval = c(pval, pval_vec[i])
+                  i = i + 1
+                } else {
+                  pval = c(pval, NA)
+                }
+              }
+            }
+            ### END ADDED by WANGSHU
+            
+            ii = 1
+            
+            for (i in unique_fr) {
+              
+              summary_tbl_c = NULL
+              
+              tmp_data_r <- data[
+                data[[input$ass_box_facet_r]] == i,
+                , drop = F
+                ] 
+              for (j in unique_fc) {
+                d_c = NULL
+                tmp_data_c <- tmp_data_r[
+                  tmp_data_r[[input$ass_box_facet_c]] == j,
+                  , drop = F
+                  ]                
+                d_c <- summary_table_all(
+                  tmp_data_c, row_var = input$ass_box_x,
+                  col_var = input$ass_box_group, val_var = input$ass_box_y,
+                  col_totals = ,
+                  name_totals = ,
+                  n_in_header = FALSE, subj_col = subj_col,
+                  baseline_name = NULL,
+                  add_cfb = , cfb_var =,
+                  func_list = summary_func,
+                  
+                  pval = pval[ii:(ii + n_x - 1)],
+                  pval_loc = "EACH",
+                  
+                  caption = '',
+                  footnote = '',
+                  rowlabel = '', format = 'csv'
+                )
+                ij <- c(",")
+                summary_tbl_c = rbind(summary_tbl_c,i,ij,j, d_c)
+                ii = ii + n_x
+              }
+              
+              summary_tbl = rbind(summary_tbl,summary_tbl_c)
+            }
+            write.csv(summary_tbl, file = file, row.names = F, na = '')
+          }
+      }else if(input$ass_download_sum_table_format == 'rtf') { 
+        summary_func <- c(
+          'N' = n_nna,
+          'Mean (SD)' = partial(mean_sd_str, digits = dgt),
+          '%CV' = partial(coeff_var_str, digits = dgt),
+          'Median' = partial(median_str, digits = dgt),
+          'Q1, Q3' = partial(q1_q3_str, digits = dgt),
+          'Min, Max' = partial(min_max_str, digits = dgt)
+        )
+        if(isTRUE(input$time_to_log)) {
+          summary_func <- c(
+            summary_func,
+            'Geom Mean (%CV)' = partial(geo_mean_cv_str, digits = dgt),
+            'Mean (SD) of LN' = partial(mean_sd_ln_str, digits = dgt)
+          )
+        }
+        
+        data <- mutate(data, hist_sum_all = seq(0,0,nrow(data)-1))
+        # Summary table without grouping;
+        if(input$ass_type == 'Box plot' && is_blank(input$ass_box_x) && is_blank(input$ass_box_group) && is_blank(input$ass_box_facet_r) && is_blank(input$ass_box_facet_c)){
+          summary_tbl <- summary_table_all(
+            data, row_var = 'hist_sum_all',row_names = ' ',
+            col_var = , val_var = input$ass_box_y,
+            col_totals = ,
+            name_totals = ,
+            n_in_header = FALSE, subj_col = subj_col,
+            baseline_name = NULL,
+            add_cfb = , cfb_var = ,
+            func_list = summary_func,
+            caption = '',
+            footnote = '',
+            rowlabel = '', format = 'rtf'
+          )
+          rtf_table_wrapper(
+            file, summary_tbl, block_break = TRUE,
+            nline_block = length(summary_func) + 1,
+            caption = time_table_title$value,
+            footnote = time_table_footnote$value
+          )
+        }
+        # Summary table with grouping in x axis;
+        if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && is_blank(input$ass_box_group) && is_blank(input$ass_box_facet_r) && is_blank(input$ass_box_facet_c)){
+            
+          
+          if(!is_blank(input$ass_box_test)) {
+            pval = (ass_box_test$value)$p_value
+            summary_tbl <- summary_table_all(
+                data, row_var = input$ass_box_x,
+                col_var = , val_var = input$ass_box_y,
+                col_totals = ,
+                name_totals = ,
+                n_in_header = FALSE, subj_col = subj_col,
+                baseline_name = NULL,
+                add_cfb = , cfb_var = ,
+                func_list = summary_func,
+                
+                pval = (ass_box_test$value)$p_value,
+                pval_loc = "LAST",
+                
+                caption = '',
+                footnote = '',
+                rowlabel = '', format = 'rtf'
+              )
+          } else if(is_blank(input$ass_box_test)) {
+
+            summary_tbl <- summary_table_all(
+              data, row_var = input$ass_box_x,
+              col_var = , val_var = input$ass_box_y,
+              col_totals = ,
+              name_totals = ,
+              n_in_header = FALSE, subj_col = subj_col,
+              baseline_name = NULL,
+              add_cfb = , cfb_var = ,
+              func_list = summary_func,
+              caption = '',
+              footnote = '',
+              rowlabel = '', format = 'rtf'
+            )
+          }
+          
+          rtf_table_wrapper(
+            file, summary_tbl, block_break = TRUE,
+            nline_block = length(summary_func) + 1,
+            caption = time_table_title$value,
+            footnote = time_table_footnote$value
+          )
+        }
+        # Summary table with grouping by input$ass_box_group;
+        else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && !is_blank(input$ass_box_group) && is_blank(input$ass_box_facet_r) && is_blank(input$ass_box_facet_c)){
+          ### ADDED by WANGSHU
+          pval = (ass_box_test$value)$p_value
+          if(!is_blank(input$ass_box_test)) {
+            pval_vec = (ass_box_test$value)$p_value
+            x_vec = (ass_box_test$value)$x
+            n_x = length(unique(data[[input$ass_box_x]]))
+            i = 1
+            pval = NULL
+            while(length(pval) <= n_x) {
+              for(j in 1:n_x) {
+                if(!is.na(x_vec[i]) && x_vec[i] == j) {
+                  pval = c(pval, pval_vec[i])
+                  i = i + 1
+                } else {
+                  pval = c(pval, NA)
+                }
+              }
+            }
+              summary_tbl <- summary_table_all(
+                data,
+                row_var = input$ass_box_x,
+                col_var = input$ass_box_group, val_var = input$ass_box_y,
+                
+                col_totals = ,
+                name_totals = ,
+                n_in_header = FALSE, subj_col = subj_col,
+                baseline_name = NULL,
+                add_cfb = , cfb_var =,
+                func_list = summary_func,
+                
+                pval = pval,
+                pval_loc = "EACH",
+                
+                caption = '',
+                footnote = '',
+                rowlabel = '', format = 'rtf'
+              )
+            }else if(is_blank(input$ass_box_test)) {
+              summary_tbl <- summary_table_all(
+                data,
+                row_var = input$ass_box_x,
+                col_var = input$ass_box_group, val_var = input$ass_box_y,
+                
+                col_totals = ,
+                name_totals = ,
+                n_in_header = FALSE, subj_col = subj_col,
+                baseline_name = NULL,
+                add_cfb = , cfb_var =,
+                func_list = summary_func,
+                caption = '',
+                footnote = '',
+                rowlabel = '', format = 'rtf'
+              )
+            }
+            
+
+            rtf_table_wrapper(
+              file, summary_tbl, block_break = TRUE,
+              nline_block = length(summary_func) + 1,
+              caption = time_table_title$value,
+              footnote = time_table_footnote$value
+            )
+          
+
+        }
+        # Summary table with grouping by input$ass_row;
+        else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && is_blank(input$ass_box_group) && !is_blank(input$ass_box_facet_r) && is_blank(input$ass_box_facet_c)){
+          summary_tbl <- summary_table_all(
+            data, row_var = input$ass_box_x,
+            col_var = input$ass_box_facet_r, val_var = input$ass_box_y,
+            col_totals = ,
+            name_totals = ,
+            n_in_header = FALSE, subj_col = subj_col,
+            baseline_name = NULL,
+            add_cfb = , cfb_var =,
+            func_list = summary_func,
+            
+            pval = (ass_box_test$value)$p_value,
+            pval_loc = "LAST",
+            
+            caption = '',
+            footnote = '',
+            rowlabel = '', format = 'rtf'
+          )
+          rtf_table_wrapper(
+            file, summary_tbl, block_break = TRUE,
+            nline_block = length(summary_func) + 1,
+            caption = time_table_title$value,
+            footnote = time_table_footnote$value
+          )
+        }
+        # Summary table with grouping by input$ass_column;
+        else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && is_blank(input$ass_box_group) && is_blank(input$ass_box_facet_r) && !is_blank(input$ass_box_facet_c)){
+          summary_tbl <- summary_table_all(
+            data, row_var = input$ass_box_x,
+            col_var = input$ass_box_facet_c, val_var = input$ass_box_y,
+            col_totals = ,
+            name_totals = ,
+            n_in_header = FALSE, subj_col = subj_col,
+            baseline_name = NULL,
+            add_cfb = , cfb_var =,
+            func_list = summary_func,
+            
+            pval = (ass_box_test$value)$p_value,
+            pval_loc = "LAST",
+            
+            caption = '',
+            footnote = '',
+            rowlabel = '', format = 'rtf'
+          )
+          rtf_table_wrapper(
+            file, summary_tbl, block_break = TRUE,
+            nline_block = length(summary_func) + 1,
+            caption = time_table_title$value,
+            footnote = time_table_footnote$value
+          )
+        }
+        
+        # Summary table with grouping by input$ass_box_group and input$ass_box_facet_r;
+        else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && !is_blank(input$ass_box_group) && !is_blank(input$ass_box_facet_r) && is_blank(input$ass_box_facet_c)){
+          # subset data into different dataframe by input$ass_box_facet_r
+          unique_fr <- c(unique(ass_box_facet_rlevs$value))
+          summary_tbl=NULL
+          d = NULL
+          
+          ### ADDED by WANGSHU
+          if(!is_blank(input$ass_box_test)) {
+            pval_vec = (ass_box_test$value)$p_value
+            x_vec = (ass_box_test$value)$x
+            n_x = length(unique(data[[input$ass_box_x]]))
+            i = 1
+            pval = NULL
+            while(length(pval) <= length(unique_fr)*n_x) {
+              for(j in 1:n_x) {
+                if(!is.na(x_vec[i]) && x_vec[i] == j) {
+                  pval = c(pval, pval_vec[i])
+                  i = i + 1
+                } else {
+                  pval = c(pval, NA)
+                }
+              }
+            }
+            ### END ADDED by WANGSHU
+            
+            ii = 1
+            for (i in unique_fr) {
+              #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
+              tmp_data <- data[
+                data[[input$ass_box_facet_r]] == i,
+                , drop = F
+                ]
+              i_m <-paste0('\n', i,'\n')
+              d <- summary_table_all(
+                tmp_data, row_var = input$ass_box_x,
+                col_var = input$ass_box_group, val_var = input$ass_box_y,
+                col_totals = ,
+                name_totals = ,
+                n_in_header = FALSE, subj_col = subj_col,
+                baseline_name = NULL,
+                add_cfb = , cfb_var =,
+                func_list = summary_func,
+                
+                pval = pval[ii:(ii + n_x - 1)],
+                pval_loc = "EACH",
+                
+                caption = '', mdgrp=i_m,
+                footnote = '',
+                rowlabel = '', format = 'rtf'
+              )
+              
+              # To change the row names of the dataframe d
+              d_nams <- row.names(d)
+              d_nams <- paste0(i,d_nams)
+              row.names(d) <- d_nams
+              
+              summary_tbl = rbind(summary_tbl,d)
+              ii = ii + n_x
+            }
+          }else{
+              for (i in unique_fr) {
+                tmp_data <- data[
+                  data[[input$ass_box_facet_r]] == i,
+                  , drop = F
+                  ]  
+                i_m <-paste0('\n', i,'\n')
+                d <- summary_table_all(
+                  tmp_data, row_var = input$ass_box_x,
+                  col_var = input$ass_box_group, val_var = input$ass_box_y,
+                  col_totals = ,
+                  name_totals = ,
+                  n_in_header = FALSE, subj_col = subj_col,
+                  baseline_name = NULL,
+                  add_cfb = , cfb_var =,
+                  func_list = summary_func,
+                  caption = '', mdgrp=i_m,
+                  footnote = '',
+                  rowlabel = '', format = 'rtf'
+                )
+                # To change the row names of the dataframe d
+                d_nams <- row.names(d)
+                d_nams <- paste0(i,d_nams)
+                row.names(d) <- d_nams
+
+                summary_tbl = rbind(summary_tbl,d)
+              }
+          }
+          
+          rtf_table_wrapper(
+            file, summary_tbl, block_break = TRUE,
+            nline_block = length(summary_func) + 1,
+            caption = time_table_title$value,
+            footnote = time_table_footnote$value
+          )
+        }
+        
+        # Summary table with grouping by input$ass_box_group and input$ass_box_facet_c;
+        else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && !is_blank(input$ass_box_group) && is_blank(input$ass_box_facet_r) && !is_blank(input$ass_box_facet_c)){
+          # subset data into different dataframe by input$ass_box_facet_r
+          #facet_row_levls <- unique_na(data[[input$ass_box_facet_r]])
+          unique_fc <- c(unique(ass_box_facet_clevs$value))
+          #facet_col_dim = unique_fc
+          summary_tbl=NULL
+          d = NULL
+          
+          ### ADDED by WANGSHU
+          if(!is_blank(input$ass_box_test)) {          
+            pval_vec = (ass_box_test$value)$p_value
+            x_vec = (ass_box_test$value)$x
+            n_x = length(unique(data[[input$ass_box_x]]))
+            i = 1
+            pval = NULL
+            while(length(pval) <= length(unique_fc)*n_x) {
+              for(j in 1:n_x) {
+                if(!is.na(x_vec[i]) && x_vec[i] == j) {
+                  pval = c(pval, pval_vec[i])
+                  i = i + 1
+                } else {
+                  pval = c(pval, NA)
+                }
+              }
+            }
+            ### END ADDED by WANGSHU
+            
+            ii = 1
+            
+            for (i in unique_fc) {
+              #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
+              tmp_data <- data[
+                data[[input$ass_box_facet_c]] == i,
+                , drop = F
+                ]  
+              i_m <-paste0('\n', i,'\n')
+              d <- summary_table_all(
+                tmp_data, row_var = input$ass_box_x,
+                col_var = input$ass_box_group, val_var = input$ass_box_y,
+                col_totals = ,
+                name_totals = ,
+                n_in_header = FALSE, subj_col = subj_col,
+                baseline_name = NULL,
+                add_cfb = , cfb_var =,
+                func_list = summary_func,
+                
+                pval = pval[ii:(ii + n_x - 1)],
+                pval_loc = "EACH",
+                
+                caption = '',
+                footnote = '', mdgrp=i_m,
+                rowlabel = '', format = 'rtf'
+              )
+              # To change the row names of the dataframe d
+              d_nams <- row.names(d)
+              d_nams <- paste0(i,d_nams)
+              row.names(d) <- d_nams              
+              summary_tbl = rbind(summary_tbl,d)
+              ii = ii + n_x
+            }
+            
+          }else{
+            for (i in unique_fc) {
+              #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
+              tmp_data <- data[
+                data[[input$ass_box_facet_c]] == i,
+                , drop = F
+                ]  
+              i_m <-paste0('\n', i,'\n')
+              d <- summary_table_all(
+                tmp_data, row_var = input$ass_box_x,
+                col_var = input$ass_box_group, val_var = input$ass_box_y,
+                col_totals = ,
+                name_totals = ,
+                n_in_header = FALSE, subj_col = subj_col,
+                baseline_name = NULL,
+                add_cfb = , cfb_var =,
+                func_list = summary_func,
+                caption = '', mdgrp=i_m,
+                footnote = '',
+                rowlabel = '', format = 'rtf'
+              )
+              # To change the row names of the dataframe d
+              d_nams <- row.names(d)
+              d_nams <- paste0(i,d_nams)
+              row.names(d) <- d_nams              
+              summary_tbl = rbind(summary_tbl,d)
+            }
+          }
+            
+          rtf_table_wrapper(
+            file, summary_tbl, block_break = TRUE,
+            nline_block = length(summary_func) + 1,
+            caption = time_table_title$value,
+            footnote = time_table_footnote$value
+          )
+        }
+        
+        # Summary table with grouping by input$ass_box_facet_c and input$ass_box_facet_r;
+        else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && is_blank(input$ass_box_group) && !is_blank(input$ass_box_facet_r) && !is_blank(input$ass_box_facet_c)){
+          # subset data into different dataframe by input$ass_box_facet_r
+          unique_fr <- c(unique(ass_box_facet_rlevs$value))
+          summary_tbl=NULL
+          d = NULL
+          
+          ### ADDED by WANGSHU
+          n_fc <- length(c(unique(ass_box_facet_clevs$value)))
+          ii = 1
+          ### END ADDED by WANGSHU
+          
+          for (i in unique_fr) {
+            #tmp_data <- data[[input$ass_box_facet_c]] == unique_fc[i]
+            tmp_data <- data[
+              data[[input$ass_box_facet_r]] == i,
+              , drop = F
+              ]  
+            d <- summary_table_all(
+              tmp_data, row_var = input$ass_box_x,
+              col_var = input$ass_box_facet_c, val_var = input$ass_box_y,
+              col_totals = ,
+              name_totals = ,
+              n_in_header = FALSE, subj_col = subj_col,
+              baseline_name = NULL,
+              add_cfb = , cfb_var =,
+              func_list = summary_func,
+              
+              pval = ((ass_box_test$value)$p_value)[ii:(ii + n_fc - 1)],
+              pval_loc = "LAST",
+              
+              caption = '',
+              footnote = '',
+              rowlabel = '', format = 'rtf'
+            )
+            summary_tbl = rbind(summary_tbl,i,d)
+            ii = ii + n_fc
+          }
+          rtf_table_wrapper(
+            file, summary_tbl, block_break = TRUE,
+            nline_block = length(summary_func) + 1,
+            caption = time_table_title$value,
+            footnote = time_table_footnote$value
+          )
+        }
+        # Summary table with grouping by input$ass_box_group and input$ass_box_facet_c and input$ass_box_facet_r;
+        else if(input$ass_type == 'Box plot' && !is_blank(input$ass_box_x) && !is_blank(input$ass_box_group) && !is_blank(input$ass_box_facet_r) && !is_blank(input$ass_box_facet_c)){
+          # subset data into different dataframe by input$ass_box_facet_r
+          unique_fr <- c(unique(ass_box_facet_rlevs$value))
+          unique_fc <- c(unique(ass_box_facet_clevs$value))
+          summary_tbl=NULL
+          d = NULL
+          
+          ### ADDED by WANGSHU
+          pval_vec = (ass_box_test$value)$p_value
+          x_vec = (ass_box_test$value)$x
+          n_x = length(unique(data[[input$ass_box_x]]))
+          #n_grp = length(unique(data[[input$ass_box_group]]))
+          i = 1
+          pval = NULL
+          while(length(pval) <= length(unique_fr)*length(unique_fc)*n_x) {
+            for(j in 1:n_x) {
+              if(!is.na(x_vec[i]) && x_vec[i] == j) {
+                pval = c(pval, pval_vec[i])
+                i = i + 1
+              } else {
+                pval = c(pval, NA)
+              }
+            }
+          }
+          ### END ADDED by WANGSHU
+          
+          ii = 1
+          
+          for (i in unique_fr) {
+            
+            summary_tbl_c = NULL
+            
+            tmp_data_r <- data[
+              data[[input$ass_box_facet_r]] == i,
+              , drop = F
+              ] 
+            for (j in unique_fc) {
+              d_c = NULL
+              tmp_data_c <- tmp_data_r[
+                tmp_data_r[[input$ass_box_facet_c]] == j,
+                , drop = F
+                ]                
+              d_c <- summary_table_all(
+                tmp_data_c, row_var = input$ass_box_x,
+                col_var = input$ass_box_group, val_var = input$ass_box_y,
+                col_totals = ,
+                name_totals = ,
+                n_in_header = FALSE, subj_col = subj_col,
+                baseline_name = NULL,
+                add_cfb = , cfb_var =,
+                func_list = summary_func,
+                
+                pval = pval[ii:(ii + n_x - 1)],
+                pval_loc = "EACH",
+                
+                caption = '',
+                footnote = '',
+                rowlabel = '', format = 'rtf'
+              )
+              ij <- c(",")
+              summary_tbl_c = rbind(summary_tbl_c,i,ij,j, d_c)
+              ii = ii + n_x
+            }
+            
+            summary_tbl = rbind(summary_tbl,summary_tbl_c)
+          }
+          rtf_table_wrapper(
+            file, summary_tbl, block_break = TRUE,
+            nline_block = length(summary_func) + 1,
+            caption = time_table_title$value,
+            footnote = time_table_footnote$value
+          )
+        }        
+      }
+    }
+  )
   
   # --- UI widgets for contingency table ---
   # a selectInput for choosing x variable
@@ -7472,6 +8354,17 @@ shinyServer(function(input, output, session) {
   
   
   # --- Association plot/table download  ---
+  # -- Association summary table download
+  # download button to specify the attributes of the summary table to download
+  output$ass_download_sum_table_action <- renderUI({
+    req(any(ass_hist_show$value, ass_scatter_show$value,
+            ass_box_show$value, ass_cormat_show$value))
+    actionButton('ass_download_sum_table_action', 'Download Association Summmary Table')
+  })
+  output$ass_download_sum_table_button <- renderUI({
+    req(!is_blank(input$ass_download_sum_table_format))
+    downloadButton('ass_download_sum_table', strong('Download table'))
+  })
   
   # -- Association plot download
   # download button to specify the attributes of the plot to download
@@ -7480,6 +8373,7 @@ shinyServer(function(input, output, session) {
             ass_box_show$value, ass_cormat_show$value))
     actionButton('ass_download_plot_action', 'Download plot')
   })
+  
   # download page height numeric input widget for association graph
   output$ass_download_plot_height <- renderUI({
     numericInput(
