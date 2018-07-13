@@ -1,5 +1,5 @@
 #------------------------------#
-# Biomarker Explorer shiny app #
+# Biomarker Explorer shiny 2018#
 #------------------------------#
 
 # global.R
