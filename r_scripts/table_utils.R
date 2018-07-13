@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Purpose:  Define utility functions for dealing with tables in Shiny
 # Author:   Feiyang Niu
-# Date:     July 26, 2016
+# Date:     July 26, 2016 modified
 #-----------------------------------------------------------------------------
 
 
